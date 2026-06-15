@@ -1,3 +1,9 @@
+from io import BytesIO
+from tempfile import NamedTemporaryFile
+
+from openpyxl import Workbook
+from openpyxl.drawing.image import Image
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -431,7 +437,16 @@ if uploaded_file:
             fig_high,
             use_container_width=True
         )
+        high_png = BytesIO()
 
+        fig_high.write_image(
+            high_png,
+            format="png",
+            width=1200,
+            height=500
+        )
+
+        high_png.seek(0)
         st.divider()
         st.subheader("Low Wave")
 
@@ -499,4 +514,102 @@ if uploaded_file:
             fig_low,
             use_container_width=True
         )
-        
+        low_png = BytesIO()
+
+        fig_low.write_image(
+            low_png,
+            format="png",
+            width=1200,
+            height=500
+        )
+
+        low_png.seek(0)
+    
+    st.divider()
+
+if st.button(
+    "Generate XLSX Report"
+):
+
+    wb = Workbook()
+
+    ws = wb.active
+    ws.title = "Analysis"
+
+    ws["A1"] = "Laser RPM Analysis"
+
+    ws["A3"] = (
+        f"Global Correlation : "
+        f"{corr:.6f}"
+    )
+
+    ws["A4"] = (
+        f"High Wave Correlation : "
+        f"{high_corr:.6f}"
+    )
+
+    ws["A5"] = (
+        f"Low Wave Correlation : "
+        f"{low_corr:.6f}"
+    )
+
+    with NamedTemporaryFile(
+        suffix=".png",
+        delete=False
+    ) as tmp1:
+
+        tmp1.write(
+            high_png.getvalue()
+        )
+
+        high_path = tmp1.name
+
+    with NamedTemporaryFile(
+        suffix=".png",
+        delete=False
+    ) as tmp2:
+
+        tmp2.write(
+            low_png.getvalue()
+        )
+
+        low_path = tmp2.name
+
+    img_high = Image(
+        high_path
+    )
+
+    img_high.width = 900
+    img_high.height = 350
+
+    ws.add_image(
+        img_high,
+        "A8"
+    )
+
+    img_low = Image(
+        low_path
+    )
+
+    img_low.width = 900
+    img_low.height = 350
+
+    ws.add_image(
+        img_low,
+        "A30"
+    )
+
+    excel_buffer = BytesIO()
+
+    wb.save(
+        excel_buffer
+    )
+
+    excel_buffer.seek(0)
+
+    st.download_button(
+        label="Download XLSX Report",
+        data=excel_buffer,
+        file_name="laser_rpm_report.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
