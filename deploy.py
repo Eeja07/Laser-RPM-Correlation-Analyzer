@@ -68,7 +68,7 @@ if uploaded_file:
         f"Laser Samples: {len(laser_raw)} | RPM Samples: {len(rpm_raw)}"
     )
 
-    c1, c2, c3= st.columns(4)
+    c1, c2, c3 = st.columns(3)
 
     with c1:
         laser_start = st.number_input(
