@@ -220,91 +220,7 @@ if uploaded_file:
         st.success("Positive Correlation")
     else:
         st.error("Negative Correlation")
-    # ==========================================
-    # MANUAL WAVE SELECTION
-    # ==========================================
 
-    # st.subheader("Wave Selection")
-
-    # c5, c6 = st.columns(2)
-
-    # with c5:
-
-    #     high_range = st.slider(
-    #         "High Wave Range",
-    #         0,
-    #         len(laser_final) - 1,
-    #         (
-    #             100,
-    #             min(
-    #                 600,
-    #                 len(laser_final) - 1
-    #             )
-    #         )
-    #     )
-
-    # with c6:
-
-    #     low_range = st.slider(
-    #         "Low Wave Range",
-    #         0,
-    #         len(laser_final) - 1,
-    #         (
-    #             min(
-    #                 800,
-    #                 len(laser_final) - 1
-    #             ),
-    #             min(
-    #                 1200,
-    #                 len(laser_final) - 1
-    #             )
-    #         )
-    #   )
-    # ==========================================
-    # HIGH WAVE
-    # ==========================================
-
-    hs, he = high_range
-
-    laser_high = laser_final[
-        hs:he
-    ]
-
-    rpm_high = rpm_final[
-        hs:he
-    ]
-
-    high_corr = np.nan
-
-    if len(laser_high) > 2:
-
-        high_corr = np.corrcoef(
-            laser_high,
-            rpm_high
-        )[0, 1]
-
-    # ==========================================
-    # LOW WAVE
-    # ==========================================
-
-    ls, le = low_range
-
-    laser_low = laser_final[
-        ls:le
-    ]
-
-    rpm_low = rpm_final[
-        ls:le
-    ]
-
-    low_corr = np.nan
-
-    if len(laser_low) > 2:
-
-        low_corr = np.corrcoef(
-            laser_low,
-            rpm_low
-        )[0, 1]
     # ==========================================
     # TABS
     # ==========================================
@@ -430,6 +346,18 @@ if uploaded_file:
             (100, 600),
             key="high"
         )
+        hs, he = high_range
+
+        laser_high = laser_final[hs:he]
+        rpm_high = rpm_final[hs:he]
+
+        high_corr = np.nan
+
+        if len(laser_high) > 2:
+            high_corr = np.corrcoef(
+                laser_high,
+                rpm_high
+            )[0,1]
         st.subheader(
             f"High Wave Correlation = {high_corr:.6f}"
         )
@@ -469,6 +397,18 @@ if uploaded_file:
             (800, 1200),
             key="low"
         )
+        ls, le = low_range
+
+        laser_low = laser_final[ls:le]
+        rpm_low = rpm_final[ls:le]
+
+        low_corr = np.nan
+
+        if len(laser_low) > 2:
+            low_corr = np.corrcoef(
+                laser_low,
+                rpm_low
+            )[0,1]
         st.subheader(
             f"Low Wave Correlation = {low_corr:.6f}"
         )
