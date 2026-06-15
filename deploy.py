@@ -149,7 +149,10 @@ if uploaded_file:
         "Invert Laser",
         value=True
     )
-
+    hold_graph = st.checkbox(
+        "Hold Graph",
+        value=False
+    )
     if invert_laser:
         laser_norm = 1 - laser_norm
 
@@ -198,7 +201,10 @@ if uploaded_file:
         ),
         rpm_norm
     )
-
+    if "laser_final_hold" not in st.session_state:
+        st.session_state.laser_final_hold = None
+        st.session_state.rpm_final_hold = None
+        st.session_state.corr_hold = None
     # ==========================================
     # CORRELATION
     # ==========================================
@@ -212,6 +218,19 @@ if uploaded_file:
             rpm_final
         )[0, 1]
 
+    if not hold_graph:
+
+        st.session_state.laser_final_hold = laser_final.copy()
+        st.session_state.rpm_final_hold = rpm_final.copy()
+        st.session_state.corr_hold = corr
+
+    else:
+
+        if st.session_state.laser_final_hold is not None:
+
+            laser_final = st.session_state.laser_final_hold
+            rpm_final = st.session_state.rpm_final_hold
+            corr = st.session_state.corr_hold
     st.metric(
         "Correlation",
         f"{corr:.6f}"
