@@ -146,51 +146,41 @@ if uploaded_file:
         )
         st.stop()
 
-    if "step_value" not in st.session_state:
-        st.session_state.step_value = 0.61
+    # positions = (
+    #     np.arange(
+    #         len(laser_crop)
+    #     ) * step
+    # )
 
-    def sync_step_main():
-        st.session_state.step_value = st.session_state.step_slider
+    # positions += rpm_start
 
-    def sync_step_tab4():
-        st.session_state.step_value = st.session_state.step_slider_tab4
+    # valid = (
+    #     positions <=
+    #     len(rpm_norm) - 1
+    # )
 
-    step = st.session_state.step_value
-    positions = (
-        np.arange(
-            len(laser_crop)
-        ) * step
-    )
+    # positions = positions[valid]
 
-    positions += rpm_start
+    # laser_final = laser_crop[
+    #     :len(positions)
+    # ]
 
-    valid = (
-        positions <=
-        len(rpm_norm) - 1
-    )
+    # rpm_final = np.interp(
+    #     positions,
+    #     np.arange(
+    #         len(rpm_norm)
+    #     ),
+    #     rpm_norm
+    # )
 
-    positions = positions[valid]
+    # corr = np.nan
 
-    laser_final = laser_crop[
-        :len(positions)
-    ]
+    # if len(laser_final) > 2:
 
-    rpm_final = np.interp(
-        positions,
-        np.arange(
-            len(rpm_norm)
-        ),
-        rpm_norm
-    )
-
-    corr = np.nan
-
-    if len(laser_final) > 2:
-
-        corr = np.corrcoef(
-            laser_final,
-            rpm_final
-        )[0, 1]
+    #     corr = np.corrcoef(
+    #         laser_final,
+    #         rpm_final
+    #     )[0, 1]
 
     if not hold_graph:
 
@@ -301,26 +291,47 @@ if uploaded_file:
             f"Global Correlation = {corr:.6f}"
         )
 
-        st.slider(
+        step = st.slider(
             "Step",
             0.30,
             1.20,
-            st.session_state.step_value,
-            0.01,
-            key="step_slider",
-            on_change=sync_step_main
+            0.61,
+            0.01
+        )
+        positions = (
+            np.arange(
+                len(laser_crop)
+            ) * step
         )
 
-        st.slider(
-            "Step (Tab 4 Sync)",
-            0.30,
-            1.20,
-            st.session_state.step_value,
-            0.01,
-            key="step_slider_tab4",
-            on_change=sync_step_tab4
+        positions += rpm_start
+
+        valid = (
+            positions <=
+            len(rpm_norm) - 1
         )
 
+        positions = positions[valid]
+
+        laser_final = laser_crop[
+            :len(positions)
+        ]
+
+        rpm_final = np.interp(
+            positions,
+            np.arange(
+                len(rpm_norm)
+            ),
+            rpm_norm
+        )
+
+        corr = np.nan
+
+        if len(laser_final) > 2:
+            corr = np.corrcoef(
+                laser_final,
+                rpm_final
+            )[0, 1]
         fig = go.Figure()
 
         fig.add_trace(
