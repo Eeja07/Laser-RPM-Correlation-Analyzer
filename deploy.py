@@ -146,6 +146,43 @@ if uploaded_file:
         )
         st.stop()
 
+    if "step_value" not in st.session_state:
+        st.session_state.step_value = 0.61
+
+    def sync_step_main():
+        st.session_state.step_value = st.session_state.step_slider
+
+    def sync_step_tab4():
+        st.session_state.step_value = st.session_state.step_slider_tab4
+
+    step = st.session_state.step_value
+    positions = (
+        np.arange(
+            len(laser_crop)
+        ) * step
+    )
+
+    positions += rpm_start
+
+    valid = (
+        positions <=
+        len(rpm_norm) - 1
+    )
+
+    positions = positions[valid]
+
+    laser_final = laser_crop[
+        :len(positions)
+    ]
+
+    rpm_final = np.interp(
+        positions,
+        np.arange(
+            len(rpm_norm)
+        ),
+        rpm_norm
+    )
+
     corr = np.nan
 
     if len(laser_final) > 2:
@@ -180,20 +217,11 @@ if uploaded_file:
         st.session_state.laser_high_hold = None
         st.session_state.rpm_high_hold = None
         st.session_state.high_corr_hold = None
-# REPLACE WITH block
+
     if "laser_low_hold" not in st.session_state:
         st.session_state.laser_low_hold = None
         st.session_state.rpm_low_hold = None
         st.session_state.low_corr_hold = None
-
-    if "step_value" not in st.session_state:
-        st.session_state.step_value = 0.61
-
-    def sync_step_main():
-        st.session_state.step_value = st.session_state.step_slider
-
-    def sync_step_tab4():
-        st.session_state.step_value = st.session_state.step_slider_tab4
 
     tab1, tab2, tab3, tab4 = st.tabs([
         "Raw Laser",
@@ -293,37 +321,6 @@ if uploaded_file:
             on_change=sync_step_tab4
         )
 
-        step = st.session_state.step_value
-        positions = (
-            np.arange(
-                len(laser_crop)
-            ) * step
-        )
-
-        positions += rpm_start
-
-        valid = (
-            positions <=
-            len(rpm_norm) - 1
-        )
-
-        positions = positions[valid]
-
-        laser_final = laser_crop[
-            :len(positions)
-        ]
-
-        rpm_final = np.interp(
-            positions,
-            np.arange(
-                len(rpm_norm)
-            ),
-            rpm_norm
-        )
-        if "laser_final_hold" not in st.session_state:
-            st.session_state.laser_final_hold = None
-            st.session_state.rpm_final_hold = None
-            st.session_state.corr_hold = None
         fig = go.Figure()
 
         fig.add_trace(
