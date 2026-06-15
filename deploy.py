@@ -239,7 +239,15 @@ if uploaded_file:
         st.success("Positive Correlation")
     else:
         st.error("Negative Correlation")
+    if "laser_high_hold" not in st.session_state:
+        st.session_state.laser_high_hold = None
+        st.session_state.rpm_high_hold = None
+        st.session_state.high_corr_hold = None
 
+    if "laser_low_hold" not in st.session_state:
+        st.session_state.laser_low_hold = None
+        st.session_state.rpm_low_hold = None
+        st.session_state.low_corr_hold = None
     # ==========================================
     # TABS
     # ==========================================
@@ -377,6 +385,19 @@ if uploaded_file:
                 laser_high,
                 rpm_high
             )[0,1]
+        if not hold_high:
+
+            st.session_state.laser_high_hold = laser_high.copy()
+            st.session_state.rpm_high_hold = rpm_high.copy()
+            st.session_state.high_corr_hold = high_corr
+
+        else:
+
+            if st.session_state.laser_high_hold is not None:
+
+                laser_high = st.session_state.laser_high_hold
+                rpm_high = st.session_state.rpm_high_hold
+                high_corr = st.session_state.high_corr_hold
         st.subheader(
             f"High Wave Correlation = {high_corr:.6f}"
         )
@@ -428,6 +449,19 @@ if uploaded_file:
                 laser_low,
                 rpm_low
             )[0,1]
+        if not hold_low:
+
+            st.session_state.laser_low_hold = laser_low.copy()
+            st.session_state.rpm_low_hold = rpm_low.copy()
+            st.session_state.low_corr_hold = low_corr
+
+        else:
+
+            if st.session_state.laser_low_hold is not None:
+
+                laser_low = st.session_state.laser_low_hold
+                rpm_low = st.session_state.rpm_low_hold
+                low_corr = st.session_state.low_corr_hold
         st.subheader(
             f"Low Wave Correlation = {low_corr:.6f}"
         )
