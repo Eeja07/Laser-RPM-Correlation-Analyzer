@@ -373,6 +373,11 @@ if uploaded_file:
             (100, 600),
             key="high"
         )
+        hold_high = st.checkbox(
+            "Hold High Wave",
+            key="hold_high"
+        )
+
         hs, he = high_range
 
         laser_high = laser_final[hs:he]
@@ -449,6 +454,10 @@ if uploaded_file:
                 laser_low,
                 rpm_low
             )[0,1]
+        hold_low = st.checkbox(
+            "Hold Low Wave",
+            key="hold_low"
+        )
         if not hold_low:
 
             st.session_state.laser_low_hold = laser_low.copy()
