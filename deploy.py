@@ -93,7 +93,36 @@ if uploaded_file:
             min_value=0,
             value=0
         )
+    positions = (
+        np.arange(
+            len(laser_crop)
+        ) * step
+    )
 
+    positions += rpm_start
+
+    valid = (
+        positions <=
+        len(rpm_norm) - 1
+    )
+
+    positions = positions[valid]
+
+    laser_final = laser_crop[
+        :len(positions)
+    ]
+
+    rpm_final = np.interp(
+        positions,
+        np.arange(
+            len(rpm_norm)
+        ),
+        rpm_norm
+    )
+    if "laser_final_hold" not in st.session_state:
+        st.session_state.laser_final_hold = None
+        st.session_state.rpm_final_hold = None
+        st.session_state.corr_hold = None
     use_sin35 = st.checkbox(
         "Use sin(35°)"
     )
