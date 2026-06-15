@@ -42,10 +42,6 @@ if uploaded_file:
         else 0
     )
 
-    # ==========================================
-    # SAFE NUMERIC CONVERSION
-    # ==========================================
-
     laser_raw = pd.to_numeric(
         df[laser_col]
         .astype(str)
@@ -72,7 +68,7 @@ if uploaded_file:
         f"Laser Samples: {len(laser_raw)} | RPM Samples: {len(rpm_raw)}"
     )
 
-    c1, c2, c3, c4 = st.columns(4)
+    c1, c2, c3= st.columns(4)
 
     with c1:
         laser_start = st.number_input(
@@ -98,22 +94,9 @@ if uploaded_file:
             value=0
         )
 
-    with c4:
-        step = st.slider(
-            "Step",
-            0.30,
-            1.20,
-            0.61,
-            0.01
-        )
-
     use_sin35 = st.checkbox(
         "Use sin(35°)"
     )
-
-    # ==========================================
-    # CORRECTION
-    # ==========================================
 
     laser_corrected = laser_raw.copy()
 
@@ -124,10 +107,6 @@ if uploaded_file:
                 np.deg2rad(35)
             )
         )
-
-    # ==========================================
-    # NORMALIZE
-    # ==========================================
 
     laser_norm = (
         laser_corrected -
@@ -145,10 +124,6 @@ if uploaded_file:
         rpm_raw.min()
     )
 
-    # ==========================================
-    # INVERT LASER
-    # ==========================================
-
     invert_laser = st.checkbox(
         "Invert Laser",
         value=True
@@ -160,10 +135,6 @@ if uploaded_file:
     if invert_laser:
         laser_norm = 1 - laser_norm
 
-    # ==========================================
-    # CROP
-    # ==========================================
-
     laser_crop = laser_norm[
         int(laser_start):
         int(laser_end)
@@ -174,44 +145,6 @@ if uploaded_file:
             "Laser crop too small"
         )
         st.stop()
-
-    # ==========================================
-    # ALIGN RPM
-    # ==========================================
-
-    positions = (
-        np.arange(
-            len(laser_crop)
-        ) * step
-    )
-
-    positions += rpm_start
-
-    valid = (
-        positions <=
-        len(rpm_norm) - 1
-    )
-
-    positions = positions[valid]
-
-    laser_final = laser_crop[
-        :len(positions)
-    ]
-
-    rpm_final = np.interp(
-        positions,
-        np.arange(
-            len(rpm_norm)
-        ),
-        rpm_norm
-    )
-    if "laser_final_hold" not in st.session_state:
-        st.session_state.laser_final_hold = None
-        st.session_state.rpm_final_hold = None
-        st.session_state.corr_hold = None
-    # ==========================================
-    # CORRELATION
-    # ==========================================
 
     corr = np.nan
 
@@ -252,9 +185,6 @@ if uploaded_file:
         st.session_state.laser_low_hold = None
         st.session_state.rpm_low_hold = None
         st.session_state.low_corr_hold = None
-    # ==========================================
-    # TABS
-    # ==========================================
 
     tab1, tab2, tab3, tab4 = st.tabs([
         "Raw Laser",
@@ -262,10 +192,6 @@ if uploaded_file:
         "Normalized + Inverted",
         "Alignment & Correlation"
     ])
-
-    # ==========================================
-    # TAB 1
-    # ==========================================
 
     with tab1:
 
@@ -286,10 +212,6 @@ if uploaded_file:
             fig,
             use_container_width=True
         )
-
-    # ==========================================
-    # TAB 2
-    # ==========================================
 
     with tab2:
 
@@ -315,10 +237,6 @@ if uploaded_file:
             use_container_width=True
         )
 
-    # ==========================================
-    # TAB 3
-    # ==========================================
-
     with tab3:
 
         fig = go.Figure()
@@ -342,20 +260,48 @@ if uploaded_file:
 
     with tab4:
 
-
         st.subheader(
             f"Global Correlation = {corr:.6f}"
         )
-        c4 = st.columns(1)
 
-        with c4:
-            step = st.slider(
-                "Step",
-                0.30,
-                1.20,
-                0.61,
-                0.01
-            )
+        step = st.slider(
+            "Step",
+            0.30,
+            1.20,
+            0.61,
+            0.01,
+            key="step_slider"
+        )
+        positions = (
+            np.arange(
+                len(laser_crop)
+            ) * step
+        )
+
+        positions += rpm_start
+
+        valid = (
+            positions <=
+            len(rpm_norm) - 1
+        )
+
+        positions = positions[valid]
+
+        laser_final = laser_crop[
+            :len(positions)
+        ]
+
+        rpm_final = np.interp(
+            positions,
+            np.arange(
+                len(rpm_norm)
+            ),
+            rpm_norm
+        )
+        if "laser_final_hold" not in st.session_state:
+            st.session_state.laser_final_hold = None
+            st.session_state.rpm_final_hold = None
+            st.session_state.corr_hold = None
         fig = go.Figure()
 
         fig.add_trace(
