@@ -210,7 +210,91 @@ if uploaded_file:
         "Correlation",
         f"{corr:.6f}"
     )
+    # ==========================================
+    # MANUAL WAVE SELECTION
+    # ==========================================
 
+    st.subheader("Wave Selection")
+
+    c5, c6 = st.columns(2)
+
+    with c5:
+
+        high_range = st.slider(
+            "High Wave Range",
+            0,
+            len(laser_final) - 1,
+            (
+                100,
+                min(
+                    600,
+                    len(laser_final) - 1
+                )
+            )
+        )
+
+    with c6:
+
+        low_range = st.slider(
+            "Low Wave Range",
+            0,
+            len(laser_final) - 1,
+            (
+                min(
+                    800,
+                    len(laser_final) - 1
+                ),
+                min(
+                    1200,
+                    len(laser_final) - 1
+                )
+            )
+        )
+    # ==========================================
+    # HIGH WAVE
+    # ==========================================
+
+    hs, he = high_range
+
+    laser_high = laser_final[
+        hs:he
+    ]
+
+    rpm_high = rpm_final[
+        hs:he
+    ]
+
+    high_corr = np.nan
+
+    if len(laser_high) > 2:
+
+        high_corr = np.corrcoef(
+            laser_high,
+            rpm_high
+        )[0, 1]
+
+    # ==========================================
+    # LOW WAVE
+    # ==========================================
+
+    ls, le = low_range
+
+    laser_low = laser_final[
+        ls:le
+    ]
+
+    rpm_low = rpm_final[
+        ls:le
+    ]
+
+    low_corr = np.nan
+
+    if len(laser_low) > 2:
+
+        low_corr = np.corrcoef(
+            laser_low,
+            rpm_low
+        )[0, 1]
     # ==========================================
     # TABS
     # ==========================================
@@ -299,45 +383,25 @@ if uploaded_file:
             use_container_width=True
         )
 
-    # ==========================================
-    # TAB 4
-    # ==========================================
-
     with tab4:
 
-        fig = make_subplots(
-            rows=2,
-            cols=1,
-            shared_xaxes=True,
-            vertical_spacing=0.08,
-            subplot_titles=(
-                "Reference Laser (Fixed)",
-                "RPM (Shifted)"
-            )
+        st.subheader(
+            f"Global Correlation = {corr:.6f}"
         )
+
+        fig = go.Figure()
 
         fig.add_trace(
             go.Scatter(
                 y=laser_final,
                 name="Laser"
-            ),
-            row=1,
-            col=1
+            )
         )
 
         fig.add_trace(
             go.Scatter(
                 y=rpm_final,
                 name="RPM"
-            ),
-            row=2,
-            col=1
-        )
-
-        fig.update_layout(
-            height=800,
-            title=(
-                f"Correlation = {corr:.6f}"
             )
         )
 
@@ -346,14 +410,64 @@ if uploaded_file:
             use_container_width=True
         )
 
-        st.write(
-            f"""
-            Laser Range : [{laser_start}:{laser_end}]
-            
-            RPM Start   : {rpm_start}
-            
-            Step        : {step:.2f}
-            
-            sin(35°)    : {'ON' if use_sin35 else 'OFF'}
-            """
+        st.divider()
+
+        st.subheader(
+            f"High Wave Correlation = {high_corr:.6f}"
+        )
+
+        fig_high = go.Figure()
+
+        fig_high.add_trace(
+            go.Scatter(
+                y=laser_high,
+                name="Laser"
+            )
+        )
+
+        fig_high.add_trace(
+            go.Scatter(
+                y=rpm_high,
+                name="RPM"
+            )
+        )
+
+        fig_high.update_layout(
+            title=f"High Wave [{hs}:{he}]"
+        )
+
+        st.plotly_chart(
+            fig_high,
+            use_container_width=True
+        )
+
+        st.divider()
+
+        st.subheader(
+            f"Low Wave Correlation = {low_corr:.6f}"
+        )
+
+        fig_low = go.Figure()
+
+        fig_low.add_trace(
+            go.Scatter(
+                y=laser_low,
+                name="Laser"
+            )
+        )
+
+        fig_low.add_trace(
+            go.Scatter(
+                y=rpm_low,
+                name="RPM"
+            )
+        )
+
+        fig_low.update_layout(
+            title=f"Low Wave [{ls}:{le}]"
+        )
+
+        st.plotly_chart(
+            fig_low,
+            use_container_width=True
         )
