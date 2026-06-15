@@ -145,7 +145,13 @@ if uploaded_file:
     # INVERT LASER
     # ==========================================
 
-    laser_norm = 1 - laser_norm
+    invert_laser = st.checkbox(
+        "Invert Laser",
+        value=True
+    )
+
+    if invert_laser:
+        laser_norm = 1 - laser_norm
 
     # ==========================================
     # CROP
@@ -210,46 +216,50 @@ if uploaded_file:
         "Correlation",
         f"{corr:.6f}"
     )
+    if corr > 0:
+        st.success("Positive Correlation")
+    else:
+        st.error("Negative Correlation")
     # ==========================================
     # MANUAL WAVE SELECTION
     # ==========================================
 
-    st.subheader("Wave Selection")
+    # st.subheader("Wave Selection")
 
-    c5, c6 = st.columns(2)
+    # c5, c6 = st.columns(2)
 
-    with c5:
+    # with c5:
 
-        high_range = st.slider(
-            "High Wave Range",
-            0,
-            len(laser_final) - 1,
-            (
-                100,
-                min(
-                    600,
-                    len(laser_final) - 1
-                )
-            )
-        )
+    #     high_range = st.slider(
+    #         "High Wave Range",
+    #         0,
+    #         len(laser_final) - 1,
+    #         (
+    #             100,
+    #             min(
+    #                 600,
+    #                 len(laser_final) - 1
+    #             )
+    #         )
+    #     )
 
-    with c6:
+    # with c6:
 
-        low_range = st.slider(
-            "Low Wave Range",
-            0,
-            len(laser_final) - 1,
-            (
-                min(
-                    800,
-                    len(laser_final) - 1
-                ),
-                min(
-                    1200,
-                    len(laser_final) - 1
-                )
-            )
-        )
+    #     low_range = st.slider(
+    #         "Low Wave Range",
+    #         0,
+    #         len(laser_final) - 1,
+    #         (
+    #             min(
+    #                 800,
+    #                 len(laser_final) - 1
+    #             ),
+    #             min(
+    #                 1200,
+    #                 len(laser_final) - 1
+    #             )
+    #         )
+    #   )
     # ==========================================
     # HIGH WAVE
     # ==========================================
@@ -411,7 +421,15 @@ if uploaded_file:
         )
 
         st.divider()
+        st.subheader("High Wave")
 
+        high_range = st.slider(
+            "Select High Wave",
+            0,
+            len(laser_final)-1,
+            (100, 600),
+            key="high"
+        )
         st.subheader(
             f"High Wave Correlation = {high_corr:.6f}"
         )
@@ -442,7 +460,15 @@ if uploaded_file:
         )
 
         st.divider()
+        st.subheader("Low Wave")
 
+        low_range = st.slider(
+            "Select Low Wave",
+            0,
+            len(laser_final)-1,
+            (800, 1200),
+            key="low"
+        )
         st.subheader(
             f"Low Wave Correlation = {low_corr:.6f}"
         )
@@ -471,3 +497,4 @@ if uploaded_file:
             fig_low,
             use_container_width=True
         )
+        
