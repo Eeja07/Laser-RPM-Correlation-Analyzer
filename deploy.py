@@ -72,7 +72,7 @@ if uploaded_file:
         f"Laser Samples: {len(laser_raw)} | RPM Samples: {len(rpm_raw)}"
     )
 
-    c1, c2, c3, c4 = st.columns(4)
+    c1, c2, c3 = st.columns(3)
 
     with c1:
         laser_start = st.number_input(
@@ -96,15 +96,6 @@ if uploaded_file:
             "RPM Start",
             min_value=0,
             value=0
-        )
-
-    with c4:
-        step = st.slider(
-            "Step",
-            0.30,
-            1.20,
-            0.61,
-            0.01
         )
 
     use_sin35 = st.checkbox(
@@ -342,10 +333,20 @@ if uploaded_file:
 
     with tab4:
 
+
         st.subheader(
             f"Global Correlation = {corr:.6f}"
         )
+        c4 = st.columns(1)
 
+        with c4:
+            step = st.slider(
+                "Step",
+                0.30,
+                1.20,
+                0.61,
+                0.01
+            )
         fig = go.Figure()
 
         fig.add_trace(
